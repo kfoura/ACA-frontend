@@ -2,7 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext(null);
-const API_URL = 'http://localhost:5001';
+const API_URL = 'https://api.aggieclassalert.com';
+const apiKey = process.env.REACT_APP_API_KEY;
+
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -21,7 +23,7 @@ export const AuthProvider = ({ children }) => {
           syncUserToMongoDB(decoded.email, decoded);
         }
       } catch (error) {
-        console.error('Error decoding token:', error);
+        //console.error('Error decoding token:', error);
         localStorage.removeItem('token');
       }
     }
@@ -41,6 +43,8 @@ export const AuthProvider = ({ children }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': apiKey
+
         },
         body: JSON.stringify({ 
           email: cleanEmail,
@@ -58,13 +62,16 @@ export const AuthProvider = ({ children }) => {
       
       return data.success;
     } catch (error) {
-      console.error('Error syncing user to MongoDB:', error);
+      //console.error('Error syncing user to MongoDB:', error);
       return false;
     }
   };
 
   const login = async (token) => {
     localStorage.setItem('token', token);
+    const id_token = token.credential;
+    localStorage.setItem('id_token', id_token);
+    
     const decoded = jwtDecode(token);
     setUser(decoded);
     
@@ -74,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     if (decoded.email) {
       await syncUserToMongoDB(decoded.email, decoded);
     } else {
-      console.warn('No email found in Google token');
+      //console.warn('No email found in Google token');
     }
   };
 
