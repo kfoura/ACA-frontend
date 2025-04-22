@@ -3,7 +3,9 @@ import { MagnifyingGlassIcon, StarIcon, AcademicCapIcon, AdjustmentsHorizontalIc
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import logProfessorSearchData from '../utils/professorSearchLogger';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = 'https://api.aggieclassalert.com';
+const idToken = localStorage.getItem('token');
+
 
 const Search = () => {
   const [department, setDepartment] = useState('');
@@ -213,7 +215,11 @@ const Search = () => {
       setDisplayDepartment(department);
       setDisplayCourseCode(courseCode);
       
-      const response = await fetch(url);
+      const response = await fetch(url, {method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+
+        }});
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -225,115 +231,119 @@ const Search = () => {
       //console.log('API Response:', data);
       
       // Debug RMP data
-      console.group('RateMyProfessor Data Debug');
-      console.log('Checking if RMP data is present in the API response:');
-      if (data.professors && data.professors.length > 0) {
-        const firstProf = data.professors[0];
-        console.log('First professor object:', firstProf);
-        console.log('Has RMP data?', 
-          firstProf.hasOwnProperty('rmp_rating') && 
-          firstProf.hasOwnProperty('rmp_would_take_again') && 
-          firstProf.hasOwnProperty('rmp_difficulty') && 
-          firstProf.hasOwnProperty('rmp_found')
-        );
-        console.log('RMP properties:', {
-          rmp_rating: firstProf.rmp_rating,
-          rmp_would_take_again: firstProf.rmp_would_take_again,
-          rmp_difficulty: firstProf.rmp_difficulty,
-          rmp_found: firstProf.rmp_found,
-          rmp_comments: firstProf.rmp_comments
-        });
-      } else {
-        console.log('No professors found in API response');
-      }
-      console.groupEnd();
+      // console.group('RateMyProfessor Data Debug');
+      // console.log('Checking if RMP data is present in the API response:');
+      // if (data.professors && data.professors.length > 0) {
+      //   const firstProf = data.professors[0];
+      //   console.log('First professor object:', firstProf);
+      //   console.log('Has RMP data?', 
+      //     firstProf.hasOwnProperty('rmp_rating') && 
+      //     firstProf.hasOwnProperty('rmp_would_take_again') && 
+      //     firstProf.hasOwnProperty('rmp_difficulty') && 
+      //     firstProf.hasOwnProperty('rmp_found')
+      //   );
+      //   console.log('RMP properties:', {
+      //     rmp_rating: firstProf.rmp_rating,
+      //     rmp_would_take_again: firstProf.rmp_would_take_again,
+      //     rmp_difficulty: firstProf.rmp_difficulty,
+      //     rmp_found: firstProf.rmp_found,
+      //     rmp_comments: firstProf.rmp_comments
+      //   });
+      // } else {
+      //   console.log('No professors found in API response');
+      // }
+      // console.groupEnd();
       
-      // Use the logger to display JSON extraction information
-      logProfessorSearchData(data);
+      // // Use the logger to display JSON extraction information
+      // logProfessorSearchData(data);
       
       // Log RMP data separately with more details
-      if (data.professors && data.professors.length > 0) {
-        logRmpData(data.professors);
-      }
+      // if (data.professors && data.professors.length > 0) {
+      //   logRmpData(data.professors);
+      // }
       
       // Log which professors are teaching next semester
-      console.group('Professors teaching next semester:');
-      const teachingProfessors = data.professors.filter(p => p.teaching_next_term);
-      console.log(`Found ${teachingProfessors.length} professors teaching next semester`);
+      // console.group('Professors teaching next semester:');
+      // const teachingProfessors = data.professors.filter(p => p.teaching_next_term);
+      // console.log(`Found ${teachingProfessors.length} professors teaching next semester`);
       
-      if (teachingProfessors.length > 0) {
-        console.table(teachingProfessors.map(p => ({
-          'Name': p.name,
-          'Teaching Next Term': p.teaching_next_term,
-          'Average GPA': p.average_gpa,
-          'Regular GPA': p.regular_gpa,
-          'Honors GPA': p.honors_gpa,
-          'Section': p.section_number || 'N/A',
-          'CRN': p.crn || 'N/A',
-          'No Historical Data': p.no_historical_data || false
-        })));
-      } else {
-        console.log('No professors found teaching next semester');
-        console.log('All professors from historical data:');
-        console.table(data.professors.slice(0, 5).map(p => ({
-          'Name': p.name,
-          'Teaching Next Term': p.teaching_next_term,
-          'Average GPA': p.average_gpa
-        })));
-      }
-      console.groupEnd();
+      // if (teachingProfessors.length > 0) {
+      //   console.table(teachingProfessors.map(p => ({
+      //     'Name': p.name,
+      //     'Teaching Next Term': p.teaching_next_term,
+      //     'Average GPA': p.average_gpa,
+      //     'Regular GPA': p.regular_gpa,
+      //     'Honors GPA': p.honors_gpa,
+      //     'Section': p.section_number || 'N/A',
+      //     'CRN': p.crn || 'N/A',
+      //     'No Historical Data': p.no_historical_data || false
+      //   })));
+      // } else {
+      //   console.log('No professors found teaching next semester');
+      //   console.log('All professors from historical data:');
+      //   console.table(data.professors.slice(0, 5).map(p => ({
+      //     'Name': p.name,
+      //     'Teaching Next Term': p.teaching_next_term,
+      //     'Average GPA': p.average_gpa
+      //   })));
+      // }
+      // console.groupEnd();
       
-      // Also log the name matching debug data
-      console.group('Name Matching Debug:');
-      console.log('Comparing historical "LAST F" names with current "First Last" names');
-      console.log('Using case-insensitive comparison of the LAST NAME only');
+      // // Also log the name matching debug data
+      // console.group('Name Matching Debug:');
+      // console.log('Comparing historical "LAST F" names with current "First Last" names');
+      // console.log('Using case-insensitive comparison of the LAST NAME only');
       
-      data.professors.forEach(p => {
-        // Historical name format is usually "LAST F" 
-        const historicalLastName = p.name.split(' ')[0].toUpperCase();
+      // data.professors.forEach(p => {
+      //   // Historical name format is usually "LAST F" 
+      //   const historicalLastName = p.name.split(' ')[0].toUpperCase();
         
-        // Check if there's section data for this professor
-        if (data.all_sections && data.all_sections.length > 0) {
-          // Log instructors from all sections to help debug name matching
-          data.all_sections.forEach(section => {
-            try {
-              const instructorJson = section.SWV_CLASS_SEARCH_INSTRCTR_JSON;
-              if (instructorJson) {
-                const instructors = typeof instructorJson === 'string' 
-                  ? JSON.parse(instructorJson)
-                  : (Array.isArray(instructorJson) ? instructorJson : [instructorJson]);
+      //   // Check if there's section data for this professor
+      //   if (data.all_sections && data.all_sections.length > 0) {
+      //     // Log instructors from all sections to help debug name matching
+      //     data.all_sections.forEach(section => {
+      //       try {
+      //         const instructorJson = section.SWV_CLASS_SEARCH_INSTRCTR_JSON;
+      //         if (instructorJson) {
+      //           const instructors = typeof instructorJson === 'string' 
+      //             ? JSON.parse(instructorJson)
+      //             : (Array.isArray(instructorJson) ? instructorJson : [instructorJson]);
                   
-                instructors.forEach(instructor => {
-                  const fullName = instructor.NAME?.replace(' (P)', '') || '';
-                  const currentLastName = fullName.split(' ').pop()?.toUpperCase();
+      //           instructors.forEach(instructor => {
+      //             const fullName = instructor.NAME?.replace(' (P)', '') || '';
+      //             const currentLastName = fullName.split(' ').pop()?.toUpperCase();
                   
-                  if (currentLastName && historicalLastName && currentLastName === historicalLastName) {
-                    console.log(`MATCH: Historical "${p.name}" (last name: ${historicalLastName}) with current "${fullName}" (last name: ${currentLastName})`);
-                  }
-                });
-              }
-            } catch (err) {
-              console.error('Error parsing instructor data:', err);
-            }
-          });
-        }
-      });
-      console.groupEnd();
+      //             if (currentLastName && historicalLastName && currentLastName === historicalLastName) {
+      //               console.log(`MATCH: Historical "${p.name}" (last name: ${historicalLastName}) with current "${fullName}" (last name: ${currentLastName})`);
+      //             }
+      //           });
+      //         }
+      //       } catch (err) {
+      //         console.error('Error parsing instructor data:', err);
+      //       }
+      //     });
+      //   }
+      // });
+      // console.groupEnd();
       
       // Get sections directly from the course sections endpoint
       try {
-        console.log(`Fetching sections for ${department} ${courseCode} from dedicated endpoint`);
+        //console.log(`Fetching sections for ${department} ${courseCode} from dedicated endpoint`);
         const sectionsUrl = `${API_URL}/api/course/sections/${department}%20${courseCode}`;
-        const sectionsResponse = await fetch(sectionsUrl);
+        const sectionsResponse = await fetch(sectionsUrl, {method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${idToken}`
+  
+          }});
         
         if (sectionsResponse.ok) {
           const sectionsData = await sectionsResponse.json();
-          console.log('Sections data:', sectionsData);
+          //console.log('Sections data:', sectionsData);
           
           if (sectionsData.sections && sectionsData.sections.length > 0) {
             // Create a formatted list of sections instead of a table
-            console.group(`All Sections for ${department} ${courseCode} in Fall 2025:`);
-            console.log(`Total Sections: ${sectionsData.sections.length}`);
+            // console.group(`All Sections for ${department} ${courseCode} in Fall 2025:`);
+            // console.log(`Total Sections: ${sectionsData.sections.length}`);
             
             // Process each section
             sectionsData.sections.forEach((section, index) => {
@@ -343,13 +353,13 @@ const Search = () => {
               const available = section.STUSEAT_OPEN === 'Y' ? 'Yes' : 'No';
               const location = `${section.SWV_CLASS_SEARCH_BLDG_CODE || 'N/A'} ${section.SWV_CLASS_SEARCH_ROOM_CODE || 'N/A'}`;
               
-              console.log(`\n%cSection ${index + 1}: ${sectionNum} (CRN: ${crn})`, 'font-weight: bold; color: #8b0000');
-              console.log(`Title: ${title}`);
-              console.log(`Available: ${available}`);
-              console.log(`Location: ${location}`);
+              // console.log(`\n%cSection ${index + 1}: ${sectionNum} (CRN: ${crn})`, 'font-weight: bold; color: #8b0000');
+              // console.log(`Title: ${title}`);
+              // console.log(`Available: ${available}`);
+              // console.log(`Location: ${location}`);
               
               // Process instructors with separate first/last names
-              console.log('%cInstructors:', 'font-weight: bold');
+              //console.log('%cInstructors:', 'font-weight: bold');
               try {
                 if (section.SWV_CLASS_SEARCH_INSTRCTR_JSON) {
                   const instructorText = section.SWV_CLASS_SEARCH_INSTRCTR_JSON;
@@ -358,7 +368,7 @@ const Search = () => {
                     (Array.isArray(instructorText) ? instructorText : [instructorText]);
                     
                   if (instructorArray.length === 0) {
-                    console.log('  - None assigned');
+                    //console.log('  - None assigned');
                   } else {
                     instructorArray.forEach((instructor, i) => {
                       if (instructor.NAME) {
@@ -466,7 +476,11 @@ const Search = () => {
     
     try {
       // Fetch detailed section information for this professor
-      const response = await fetch(`${API_URL}/api/course/sections/${department.toUpperCase()} ${courseCode}`);
+      const response = await fetch(`${API_URL}/api/course/sections/${department.toUpperCase()} ${courseCode}`, {method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+
+        }});
       
       if (response.ok) {
         const data = await response.json();
@@ -503,22 +517,22 @@ const Search = () => {
           }
           
           // Log detailed section information for the clicked professor
-          console.group(`Detailed Sections for ${professor.name}:`);
-          console.log(`Professor: ${professor.name}`);
-          console.log(`Number of matched sections: ${professorSections.length}`);
+          // console.group(`Detailed Sections for ${professor.name}:`);
+          // console.log(`Professor: ${professor.name}`);
+          // console.log(`Number of matched sections: ${professorSections.length}`);
           
           // Define professorSectionNumbers here before using it
           const professorSectionNumbers = professor.courses.map(course => course.section);
-          console.log(`Section numbers from professor data: ${professorSectionNumbers.join(', ')}`);
+          //console.log(`Section numbers from professor data: ${professorSectionNumbers.join(', ')}`);
           
           professorSections.forEach((section, index) => {
-            console.group(`Section ${index + 1}: ${section.SWV_CLASS_SEARCH_SECTION} (CRN: ${section.SWV_CLASS_SEARCH_CRN})`);
+            //console.group(`Section ${index + 1}: ${section.SWV_CLASS_SEARCH_SECTION} (CRN: ${section.SWV_CLASS_SEARCH_CRN})`);
             
             // Log the basic section details
-            console.log(`Title: ${section.SWV_CLASS_SEARCH_TITLE || 'N/A'}`);
-            console.log(`Max Enrollment: ${section.SEATS_MAX_ENROLLMENT || 'N/A'}`);
-            console.log(`Current Enrollment: ${section.SEATS_ACTUAL_ENROLLMENT || 'N/A'}`);
-            console.log(`Available: ${section.STUSEAT_OPEN === 'Y' ? 'Yes' : 'No'}`);
+            // console.log(`Title: ${section.SWV_CLASS_SEARCH_TITLE || 'N/A'}`);
+            // console.log(`Max Enrollment: ${section.SEATS_MAX_ENROLLMENT || 'N/A'}`);
+            // console.log(`Current Enrollment: ${section.SEATS_ACTUAL_ENROLLMENT || 'N/A'}`);
+            // console.log(`Available: ${section.STUSEAT_OPEN === 'Y' ? 'Yes' : 'No'}`);
             
             // Try to extract and log instructor details
             try {
@@ -528,10 +542,10 @@ const Search = () => {
                   JSON.parse(instructorText) : 
                   (Array.isArray(instructorText) ? instructorText : [instructorText]);
                 
-                console.log('Instructors:');
+                //console.log('Instructors:');
                 instructors.forEach((instructor, i) => {
                   const name = instructor.NAME?.replace(' (P)', '') || 'Unknown';
-                  console.log(`  - ${name}`);
+                  //console.log(`  - ${name}`);
                 });
               } else {
                 console.log('No instructor data available');
@@ -549,7 +563,7 @@ const Search = () => {
                 }
                 
                 if (Array.isArray(meetingInfo) && meetingInfo.length > 0) {
-                  console.log('Meeting Times:');
+                  //console.log('Meeting Times:');
                   meetingInfo.forEach((meeting, i) => {
                     // Build day string
                     const days = [];
@@ -748,7 +762,12 @@ const Search = () => {
       const userEmail = email || localStorage.getItem('userEmail') || 'colinxu2006@gmail.com';
       
       // Get the user profile to see if they have phone verification
-      const profileResponse = await fetch(`${API_URL}/api/users/profile?email=${encodeURIComponent(userEmail)}`);
+      const profileResponse = await fetch(`${API_URL}/api/users/profile?email=${encodeURIComponent(userEmail)}`, {method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${idToken}`
+
+      }
+    });
       let userProfile = {};
       
       if (profileResponse.ok) {
@@ -778,7 +797,9 @@ const Search = () => {
       const response = await fetch(`${API_URL}/api/add-alert`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify(alertData)
       });
@@ -891,7 +912,11 @@ const Search = () => {
   useEffect(() => {
     const checkRmpAvailability = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/status`);
+        const response = await fetch(`${API_URL}/api/status`, {method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${idToken}`
+  
+          }});
         if (response.ok) {
           const data = await response.json();
           setRmpModuleAvailable(data.rmp_available || false);

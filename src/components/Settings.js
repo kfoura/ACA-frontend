@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { PhoneIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = 'https://api.aggieclassalert.com';
+const idToken = localStorage.getItem('token');
+
 
 const Settings = (props) => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -21,7 +23,7 @@ const Settings = (props) => {
   const carriers = [
     { id: 'verizon', name: 'Verizon', domain: '@vtext.com' },
     { id: 'att', name: 'AT&T', domain: '@txt.att.net' },
-    { id: 'tmobile', name: 'T-Mobile', domain: '@tmomail.net' },
+   // { id: 'tmobile', name: 'T-Mobile', domain: '@tmomail.net' },
     { id: 'sprint', name: 'Sprint', domain: '@messaging.sprintpcs.com' },
     { id: 'cricket', name: 'Cricket Wireless', domain: '@mms.cricketwireless.net' },
     { id: 'boost', name: 'Boost Mobile', domain: '@sms.myboostmobile.com' },
@@ -43,10 +45,16 @@ const Settings = (props) => {
         
         if (userEmail) {
           // Try to get user profile with the email
-          response = await fetch(`${API_URL}/api/users/profile?email=${encodeURIComponent(userEmail)}`);
+          response = await fetch(`${API_URL}/api/users/profile?email=${encodeURIComponent(userEmail)}`, {method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${idToken}`
+            }});
         } else {
           // If no email, try to get user with blank email
-          response = await fetch(`${API_URL}/api/users/profile?email=`);
+          response = await fetch(`${API_URL}/api/users/profile?email=`, {method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${idToken}`
+            }});
         }
         
         if (response.ok) {
@@ -73,10 +81,10 @@ const Settings = (props) => {
             setCarrier(userData.phone_carrier || '');
           }
         } else {
-          console.log('No existing user profile found or error fetching profile');
+          //console.log('No existing user profile found or error fetching profile');
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        //console.error('Error fetching user data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -122,6 +130,8 @@ const Settings = (props) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify({
           phoneNumber: phoneNumber,
@@ -176,6 +186,8 @@ const Settings = (props) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify({
           code: verificationCode,
@@ -214,7 +226,11 @@ const Settings = (props) => {
             ? `${API_URL}/api/users/profile?email=${encodeURIComponent(userEmail)}`
             : `${API_URL}/api/users/profile?phone=${encodeURIComponent(phoneNumber)}`;
             
-          const profileResponse = await fetch(profileUrl);
+          const profileResponse = await fetch(profileUrl, {method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${idToken}`
+    
+            }});
           
           if (profileResponse.ok) {
             const userData = await profileResponse.json();
@@ -229,7 +245,7 @@ const Settings = (props) => {
             }
           }
         } catch (refreshError) {
-          console.error("Error refreshing user profile:", refreshError);
+          //console.error("Error refreshing user profile:", refreshError);
         }
       } else {
         setSuccessMessage('Your phone number has been verified successfully');
@@ -337,10 +353,11 @@ const Settings = (props) => {
               
               <button
                 type="button"
-                onClick={handleResetVerification}
+                //onClick={handleResetVerification}
                 className="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
               >
-                Change phone number
+                {/*Change phone number*/} 
+		This service is temporarily unavailable.
               </button>
             </div>
           </div>
@@ -494,13 +511,14 @@ const Settings = (props) => {
             )}
 
           {/* Save Button */}
-          <button
+          {/*<button
             type="submit"
               disabled={!verificationSuccess || isSubmitting}
               className="w-full px-4 py-3 bg-maroon text-white rounded-lg hover:bg-maroon/90 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
               {isSubmitting ? 'Saving...' : 'Save Verified Phone Number'}
-          </button>
+          </button>*/}
+	  <p> This service is currently under maintenance. </p>
         </form>
         )}
       </div>

@@ -5,7 +5,8 @@ import SimpleLogin from './SimpleLogin';
 import { useAuth } from '../context/AuthContext';
 import { sendClassAvailabilityNotification } from '../utils/NotificationService';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = 'https://api.aggieclassalert.com';
+const idToken = localStorage.getItem('token');
 
 const MyAlerts = () => {
   const { user, logout } = useAuth(); // Get user and logout from Auth context
@@ -60,7 +61,11 @@ const MyAlerts = () => {
     if (!userEmail) return;
     
     try {
-      const response = await fetch(`${API_URL}/api/users/profile?email=${encodeURIComponent(userEmail)}`);
+      const response = await fetch(`${API_URL}/api/users/profile?email=${encodeURIComponent(userEmail)}`, {method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+
+        }});
       
       if (response.ok) {
         const userData = await response.json();
@@ -88,6 +93,8 @@ const MyAlerts = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         }
       });
       
@@ -107,13 +114,13 @@ const MyAlerts = () => {
           createUserViaLogin(email);
         }
       } else {
-        console.error('Error checking user in MongoDB');
+        //console.error('Error checking user in MongoDB');
         setError('Error verifying user. Please try again.');
         localStorage.removeItem('userEmail');
         fetchAlerts();
       }
     } catch (error) {
-      console.error('Error checking MongoDB user:', error);
+      //console.error('Error checking MongoDB user:', error);
       setError('Error connecting to the database. Please try again.');
       localStorage.removeItem('userEmail');
       fetchAlerts();
@@ -133,6 +140,8 @@ const MyAlerts = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify({ email })
       });
@@ -161,7 +170,13 @@ const MyAlerts = () => {
         // Verify user was created by checking the database
         setTimeout(() => {
           //console.log('Verifying user was created in database...');
-          fetch(`${API_URL}/api/users/check/${encodeURIComponent(email)}`)
+          fetch(`${API_URL}/api/users/check/${encodeURIComponent(email)}`, {method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${idToken}`
+    
+            }
+
+          })
             .then(res => res.json())
             .then(checkResult => {
               //console.log('User verification result:', checkResult);
@@ -169,12 +184,12 @@ const MyAlerts = () => {
             .catch(err => console.error('Error verifying user:', err));
         }, 1000);
       } else {
-        console.error('Failed to create user via login:', data);
+        //console.error('Failed to create user via login:', data);
         setError(data.error || 'Failed to create user account. Please try again.');
         // Don't remove from localStorage here - give a chance to retry
       }
     } catch (error) {
-      console.error('Error in createUserViaLogin:', error);
+      //console.error('Error in createUserViaLogin:', error);
       setError('Error creating user account. Please check your connection and try again.');
     }
   };
@@ -186,6 +201,8 @@ const MyAlerts = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         }
       });
       if (response.ok) {
@@ -193,16 +210,16 @@ const MyAlerts = () => {
         setAlerts(data);
         
         // Add console logging for class availability
-        console.log('--- Class Availability Status ---');
-        data.forEach(alert => {
-          console.log(`CRN ${alert.CRN} (${alert.Term}): ${alert.status ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
-        });
-        console.log('-------------------------------');
+        //console.log('--- Class Availability Status ---');
+        // data.forEach(alert => {
+        //   console.log(`CRN ${alert.CRN} (${alert.Term}): ${alert.status ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
+        // });
+        //console.log('-------------------------------');
       } else {
-        console.error('Failed to fetch alerts');
+        //console.error('Failed to fetch alerts');
       }
     } catch (error) {
-      console.error('Error fetching alerts:', error);
+      //console.error('Error fetching alerts:', error);
     }
   };
 
@@ -213,6 +230,8 @@ const MyAlerts = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         }
       });
       
@@ -220,10 +239,10 @@ const MyAlerts = () => {
         const data = await response.json();
         setSampleCRNs(data.samples);
       } else {
-        console.error('Failed to fetch sample CRNs');
+        //console.error('Failed to fetch sample CRNs');
       }
     } catch (error) {
-      console.error('Error fetching sample CRNs:', error);
+      //console.error('Error fetching sample CRNs:', error);
     } finally {
       setLoadingSamples(false);
     }
@@ -255,6 +274,8 @@ const MyAlerts = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+
           },
           body: JSON.stringify({ email })
         });
@@ -266,7 +287,7 @@ const MyAlerts = () => {
           setIsLoggedIn(true);
           //console.log(`User logged in before adding alert: ${email}`);
         } else {
-          console.error('Error logging in user before adding alert');
+          //console.error('Error logging in user before adding alert');
         }
       }
 
@@ -275,6 +296,8 @@ const MyAlerts = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify({
           crn: newCRN,
@@ -287,7 +310,7 @@ const MyAlerts = () => {
       try {
         data = await response.json();
       } catch (err) {
-        console.error('Error parsing JSON response:', err);
+        //console.error('Error parsing JSON response:', err);
         setError('Invalid response from server');
         setLoading(false);
         return;
@@ -319,7 +342,7 @@ const MyAlerts = () => {
         setError(data.error || 'Failed to add alert');
       }
     } catch (error) {
-      console.error('Error adding alert:', error);
+      //console.error('Error adding alert:', error);
       setError('An error occurred while adding the alert');
     } finally {
       setLoading(false);
@@ -338,6 +361,8 @@ const MyAlerts = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify({
           crn: crn.toString(),
@@ -352,13 +377,13 @@ const MyAlerts = () => {
         //console.log(`✅ Successfully deleted alert for CRN ${crn}`);
         setDeleteMessage(data.message);
         setTimeout(() => setDeleteMessage(''), 3000); // Clear message after 3 seconds
-        fetchAlerts(); // Refresh the alerts list
+        fetchAlertsByEmail(email); // Refresh the alerts list
       } else {
-        console.error(`❌ Error deleting alert for CRN ${crn}:`, data.error);
+        //console.error(`❌ Error deleting alert for CRN ${crn}:`, data.error);
         setError(data.error || 'Failed to delete alert');
       }
     } catch (error) {
-      console.error('Error deleting alert:', error);
+      //console.error('Error deleting alert:', error);
       setError('An error occurred while deleting the alert');
     } finally {
       setIsDeleting(false);
@@ -377,6 +402,8 @@ const MyAlerts = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         }
       });
       
@@ -386,17 +413,17 @@ const MyAlerts = () => {
         setIsFilteringByEmail(true);
         
         // Add console logging for class availability
-        console.log(`--- Class Availability Status for ${email} ---`);
-        data.forEach(alert => {
-          console.log(`CRN ${alert.CRN} (${alert.Term}): ${alert.status ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
-        });
-        console.log('-------------------------------');
+        // console.log(`--- Class Availability Status for ${email} ---`);
+        // data.forEach(alert => {
+        //   console.log(`CRN ${alert.CRN} (${alert.Term}): ${alert.status ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
+        // });
+        // console.log('-------------------------------');
       } else {
-        console.error('Failed to fetch alerts by email');
+        //console.error('Failed to fetch alerts by email');
         setError('Failed to retrieve alerts for this email');
       }
     } catch (error) {
-      console.error('Error fetching alerts by email:', error);
+      //console.error('Error fetching alerts by email:', error);
       setError('An error occurred while retrieving alerts');
     } finally {
       setLoading(false);
@@ -425,6 +452,7 @@ const MyAlerts = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
       },
       body: JSON.stringify({ email })
     })
@@ -448,12 +476,12 @@ const MyAlerts = () => {
         setSuccessMessage('Login successful!');
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
-        console.error('Error in login API response:', data);
+        //console.error('Error in login API response:', data);
         setError(data.error || 'Failed to login. Please try again.');
       }
     })
     .catch(error => {
-      console.error('Error in login API call:', error);
+      //console.error('Error in login API call:', error);
       setError('Error connecting to the server. Please try again.');
     });
   };
@@ -508,7 +536,7 @@ const MyAlerts = () => {
           });
           //console.log('Test SMS notification sent successfully');
         } catch (smsError) {
-          console.error('Failed to send test SMS notification:', smsError);
+          //console.error('Failed to send test SMS notification:', smsError);
           alert('Failed to send test SMS. Please check your phone number and carrier settings.');
           setPhoneToggleLoading(false);
           return;
@@ -520,6 +548,8 @@ const MyAlerts = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify({
           crn: crn,
@@ -552,11 +582,11 @@ const MyAlerts = () => {
         // Clear success message after 3 seconds
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
-        console.error('Error updating alert:', data.error);
+        //console.error('Error updating alert:', data.error);
         setError(data.error || 'Failed to update notification settings');
       }
     } catch (error) {
-      console.error('Error toggling phone notification:', error);
+      //console.error('Error toggling phone notification:', error);
       setError('An error occurred while updating notification settings');
     } finally {
       setPhoneToggleLoading(false);
@@ -684,7 +714,17 @@ const MyAlerts = () => {
         )}
 
         {/* Render the updated table with the SMS column */}
-        {renderAlertTable()}
+        {isLoggedIn ? ( renderAlertTable() ) : (
+           <div className="text-center text-gray-600 mt-8">
+           <p>Please log in to view your alerts.</p>
+           <button 
+             onClick={handleLoginClick}
+             className="mt-4 px-4 py-2 bg-maroon text-white rounded-lg hover:bg-maroon/90 transition-colors"
+           >
+             Log In
+           </button>
+         </div>
+        )}
         
         {/* Add Alert Modal */}
         {showAddAlert && (

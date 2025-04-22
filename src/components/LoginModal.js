@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const LoginModal = ({ isOpen, onClose }) => {
   const { login } = useAuth();
   // To bypass any environment variable issues, hardcode for testing
-  const clientId = '76395303091-hn56cbkb13d3eo431384hmvksn52lrt2.apps.googleusercontent.com';
+  const clientId =  process.env.REACT_APP_GOOGLE_CLIENT_ID;
   
   useEffect(() => {
     //console.log("Using client ID:", clientId);

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = 'https://api.aggieclassalert.com';
+const idToken = localStorage.getItem('token');
+
 
 const SimpleLogin = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
@@ -11,9 +13,9 @@ const SimpleLogin = ({ onLoginSuccess }) => {
   //console.log('SimpleLogin component rendered with onLoginSuccess:', !!onLoginSuccess);
   
   // Log that the API URL is correctly set
-  useEffect(() => {
-    console.log('SimpleLogin component mounted with API_URL:', API_URL);
-  }, []);
+  // useEffect(() => {
+  //   console.log('SimpleLogin component mounted with API_URL:', API_URL);
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,6 +51,8 @@ const SimpleLogin = ({ onLoginSuccess }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+
         },
         body: JSON.stringify({ email: cleanEmail })
       });
@@ -71,16 +75,16 @@ const SimpleLogin = ({ onLoginSuccess }) => {
           //console.log('CALLING onLoginSuccess callback with email:', cleanEmail);
           onLoginSuccess(cleanEmail);
         } else {
-          console.warn('onLoginSuccess callback is not provided!');
+          //console.warn('onLoginSuccess callback is not provided!');
         }
       } else {
-        console.error('Login failed:', data);
+        //console.error('Login failed:', data);
         setError(data.error || 'Login failed. Please try again.');
       }
     } catch (error) {
-      console.error('Error during login:', error);
-      console.error('Error details:', error.message);
-      console.error('Error stack:', error.stack);
+      // console.error('Error during login:', error);
+      // console.error('Error details:', error.message);
+      // console.error('Error stack:', error.stack);
       setError('An error occurred. Please check your connection and try again.');
     } finally {
       setLoading(false);
