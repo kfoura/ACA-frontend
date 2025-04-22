@@ -2,8 +2,8 @@
  * Notification service for handling SMS and other notifications
  */
 
-const API_URL = 'http://localhost:5001';
-
+const API_URL = 'https://api.aggieclassalert.com';
+const idToken = localStorage.getItem('token');
 /**
  * Send an SMS notification
  * @param {Object|string} optionsOrPhoneNumber - Either notification options object or phone number string
@@ -29,6 +29,7 @@ export const sendSMS = (options = {}) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
     },
     body: JSON.stringify(payload),
   })
@@ -43,13 +44,13 @@ export const sendSMS = (options = {}) => {
         if (onSuccess) onSuccess(data);
         return data;
       } else {
-        console.error('SMS sending failed:', data.error);
+        //console.error('SMS sending failed:', data.error);
         if (onError) onError(data.error);
         throw new Error(data.error);
       }
     })
     .catch(error => {
-      console.error('Error sending SMS:', error);
+      //console.error('Error sending SMS:', error);
       if (onError) onError(error.message || 'Unknown error');
       throw error;
     });
@@ -89,6 +90,7 @@ export const sendClassAvailabilityNotification = (options = {}) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
     },
     body: JSON.stringify(payload),
   })
@@ -103,13 +105,13 @@ export const sendClassAvailabilityNotification = (options = {}) => {
         if (onSuccess) onSuccess(data);
         return data;
       } else {
-        console.error('Class availability notification failed:', data.error);
+        //console.error('Class availability notification failed:', data.error);
         if (onError) onError(data.error);
         throw new Error(data.error);
       }
     })
     .catch(error => {
-      console.error('Error sending class availability notification:', error);
+      //console.error('Error sending class availability notification:', error);
       if (onError) onError(error.message || 'Unknown error');
       throw error;
     });
