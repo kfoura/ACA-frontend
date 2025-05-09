@@ -51,7 +51,7 @@ const MyAlerts = () => {
         checkUserInMongoDB(savedEmail);
         checkUserPhoneStatus(savedEmail);
       } else {
-        fetchAlerts();
+        //fetchAlerts();
       }
     }
   }, [user]);
@@ -117,13 +117,13 @@ const MyAlerts = () => {
         //console.error('Error checking user in MongoDB');
         setError('Error verifying user. Please try again.');
         localStorage.removeItem('userEmail');
-        fetchAlerts();
+        //fetchAlerts();
       }
     } catch (error) {
       //console.error('Error checking MongoDB user:', error);
       setError('Error connecting to the database. Please try again.');
       localStorage.removeItem('userEmail');
-      fetchAlerts();
+      //fetchAlerts();
     }
   };
 
@@ -195,33 +195,33 @@ const MyAlerts = () => {
   };
 
   // Fetch existing alerts from backend
-  const fetchAlerts = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/alerts`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
+  // const fetchAlerts = async () => {
+  //   try {
+  //     const response = await fetch(`${API_URL}/api/alerts`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${idToken}`
 
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setAlerts(data);
+  //       }
+  //     });
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setAlerts(data);
         
-        // Add console logging for class availability
-        //console.log('--- Class Availability Status ---');
-        // data.forEach(alert => {
-        //   console.log(`CRN ${alert.CRN} (${alert.Term}): ${alert.status ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
-        // });
-        //console.log('-------------------------------');
-      } else {
-        //console.error('Failed to fetch alerts');
-      }
-    } catch (error) {
-      //console.error('Error fetching alerts:', error);
-    }
-  };
+  //       // Add console logging for class availability
+  //       //console.log('--- Class Availability Status ---');
+  //       // data.forEach(alert => {
+  //       //   console.log(`CRN ${alert.CRN} (${alert.Term}): ${alert.status ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
+  //       // });
+  //       //console.log('-------------------------------');
+  //     } else {
+  //       //console.error('Failed to fetch alerts');
+  //     }
+  //   } catch (error) {
+  //     //console.error('Error fetching alerts:', error);
+  //   }
+  // };
 
   const fetchSampleCRNs = async () => {
     setLoadingSamples(true);
@@ -329,7 +329,7 @@ const MyAlerts = () => {
         if (isLoggedIn || email) {
           fetchAlertsByEmail(email);
         } else {
-          fetchAlerts();
+          //fetchAlerts();
         }
         
         // Show a message about the phone notification status
@@ -432,7 +432,7 @@ const MyAlerts = () => {
 
   const clearEmailFilter = () => {
     setIsFilteringByEmail(false);
-    fetchAlerts();
+    //fetchAlerts();
     setEmailFilter('');
   };
 
